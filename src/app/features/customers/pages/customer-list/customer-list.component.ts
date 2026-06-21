@@ -16,6 +16,7 @@ import { CustomerResponse, PagedResult } from '../../../../core/api/api.types';
 import { LoadingSpinnerComponent } from '../../../../shared/loading-spinner/loading-spinner.component';
 import { ErrorBannerComponent } from '../../../../shared/error-banner/error-banner.component';
 import { BgCurrencyPipe } from '../../../../shared/pipes/bg-currency.pipe';
+import { CustomerFormat } from '../../utils/customer-format';
 
 @Component({
   selector: 'app-customer-list',
@@ -63,8 +64,9 @@ export class CustomerListComponent implements OnInit {
   }
 
   onSearchInput(value: string): void {
-    this.searchTerm.set(value);
-    this.searchSubject.next(value);
+    const normalized = CustomerFormat.normalizeIdentification(value);
+    this.searchTerm.set(normalized);
+    this.searchSubject.next(normalized);
   }
 
   onActiveOnlyChange(value: boolean): void {
