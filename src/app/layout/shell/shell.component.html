@@ -1,0 +1,42 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <button mat-icon-button (click)="sidenav.toggle()" class="menu-toggle">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="app-title">BG Invoice</span>
+  <span class="toolbar-spacer"></span>
+  <span class="user-info">{{ authState.currentUser()?.firstName }} {{ authState.currentUser()?.lastName }}</span>
+  <button mat-icon-button (click)="logout()" matTooltip="Cerrar sesi&oacute;n">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #sidenav
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="!isMobile()"
+    class="app-sidenav"
+  >
+    <mat-nav-list>
+      @for (menu of authState.menus(); track menu.id) {
+        <a
+          mat-list-item
+          [routerLink]="menu.route"
+          routerLinkActive
+          #rla="routerLinkActive"
+          [activated]="rla.isActive"
+          (click)="isMobile() && sidenav.close()"
+        >
+          <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
+          <span matListItemTitle>{{ menu.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="sidenav-content">
+    <div class="content-wrapper">
+      <router-outlet />
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
