@@ -42,7 +42,7 @@ export class PaginatedTableComponent<T> {
 
   readonly dataSource = new MatTableDataSource<T>([]);
 
-  get displayedColumns(): string[] {
+  displayedColumns(): string[] {
     return this.columns.map((c) => c.key);
   }
 }
