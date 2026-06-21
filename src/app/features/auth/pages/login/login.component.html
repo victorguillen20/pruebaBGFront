@@ -1,0 +1,48 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Iniciar Sesi&oacute;n</mat-card-title>
+      <mat-card-subtitle>BG Invoice</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Usuario</mat-label>
+          <input matInput formControlName="userName" placeholder="Ingrese su usuario" autocomplete="username" />
+          @if (form.get('userName')?.errors?.['required'] && form.get('userName')?.touched) {
+            <mat-error>El usuario es obligatorio</mat-error>
+          }
+          @if (form.get('userName')?.errors?.['minlength']) {
+            <mat-error>El usuario debe tener al menos 3 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contrase&ntilde;a</mat-label>
+          <input matInput formControlName="password" type="password" placeholder="Ingrese su contrase&ntilde;a" autocomplete="current-password" />
+          @if (form.get('password')?.errors?.['required'] && form.get('password')?.touched) {
+            <mat-error>La contrase&ntilde;a es obligatoria</mat-error>
+          }
+          @if (form.get('password')?.errors?.['minlength']) {
+            <mat-error>La contrase&ntilde;a debe tener al menos 6 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        @if (errorMessage) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <button mat-raised-button color="primary" class="full-width submit-btn" type="submit" [disabled]="form.invalid || loading">
+          @if (loading) {
+            <mat-spinner diameter="20"></mat-spinner>
+          }
+          <span>Ingresar</span>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
