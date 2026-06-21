@@ -1,0 +1,82 @@
+.page-header {
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 8px 0 0;
+    font-size: 22px;
+    font-weight: 500;
+  }
+}
+
+.back-link {
+  padding: 0;
+  font-size: 14px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.info-card {
+  mat-card-content {
+    padding-top: 16px;
+  }
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+
+  .label {
+    font-weight: 500;
+    color: #666;
+    font-size: 13px;
+    margin-right: 12px;
+  }
+}
+
+.section-card {
+  margin-bottom: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.totals {
+  margin-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 12px;
+  max-width: 300px;
+  margin-left: auto;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.total-final {
+  font-weight: 600;
+  font-size: 16px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+}

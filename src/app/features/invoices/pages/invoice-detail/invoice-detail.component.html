@@ -1,0 +1,158 @@
+@if (loading()) {
+  <app-loading-spinner [loading]="true" />
+} @else if (error()) {
+  <app-error-banner [message]="error()" (retry)="load()" />
+} @else {
+  @if (invoice(); as inv) {
+    <div class="page-header">
+      <a mat-button routerLink="/invoices" class="back-link">&larr; Volver a facturas</a>
+      <h1>Factura #{{ inv.number }}</h1>
+    </div>
+
+    <div class="detail-grid">
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>Informaci&oacute;n general</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <span class="label">N&uacute;mero:</span>
+            <span>{{ inv.number }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Fecha:</span>
+            <span>{{ inv.date | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Tipo:</span>
+            <span>{{ inv.type === 1 ? 'Contado' : 'Cr\u00e9dito' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Estado:</span>
+            <mat-chip [color]="inv.status === InvoiceStatus.Pagada ? 'primary' : inv.status === InvoiceStatus.Anulada ? 'warn' : 'accent'" highlighted>
+              {{ inv.status === InvoiceStatus.Pendiente ? 'Pendiente' : inv.status === InvoiceStatus.Pagada ? 'Pagada' : 'Anulada' }}
+            </mat-chip>
+          </div>
+          @if (inv.notes) {
+            <div class="info-row">
+              <span class="label">Notas:</span>
+              <span>{{ inv.notes }}</span>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>Cliente</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <span class="label">Nombre:</span>
+            <span>{{ inv.customerName }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>Vendedor</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <span class="label">Nombre:</span>
+            <span>{{ inv.sellerName }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Detalle de l&iacute;neas</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="inv.details" class="full-width">
+          <ng-container matColumnDef="product">
+            <th mat-header-cell *matHeaderCellDef>Producto</th>
+            <td mat-cell *matCellDef="let d">{{ d.productName }}</td>
+          </ng-container>
+          <ng-container matColumnDef="code">
+            <th mat-header-cell *matHeaderCellDef>C&oacute;digo</th>
+            <td mat-cell *matCellDef="let d">{{ d.productCode }}</td>
+          </ng-container>
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+            <td mat-cell *matCellDef="let d">{{ d.quantity }}</td>
+          </ng-container>
+          <ng-container matColumnDef="unitPrice">
+            <th mat-header-cell *matHeaderCellDef>Precio unitario</th>
+            <td mat-cell *matCellDef="let d">{{ d.unitPrice | bgCurrency }}</td>
+          </ng-container>
+          <ng-container matColumnDef="lineTotal">
+            <th mat-header-cell *matHeaderCellDef>Total l&iacute;nea</th>
+            <td mat-cell *matCellDef="let d">{{ d.lineTotal | bgCurrency }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="detailColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: detailColumns"></tr>
+        </table>
+
+        <div class="totals">
+          <div class="total-row">
+            <span>Subtotal:</span>
+            <span>{{ inv.subtotal | bgCurrency }}</span>
+          </div>
+          <div class="total-row">
+            <span>Impuesto:</span>
+            <span>{{ inv.taxAmount | bgCurrency }}</span>
+          </div>
+          <div class="total-row total-final">
+            <span>Total:</span>
+            <span>{{ inv.total | bgCurrency }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    @if (inv.payments.length > 0) {
+      <mat-card class="section-card">
+        <mat-card-header>
+          <mat-card-title>Pagos</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <table mat-table [dataSource]="inv.payments" class="full-width">
+            <ng-container matColumnDef="method">
+              <th mat-header-cell *matHeaderCellDef>M&eacute;todo</th>
+              <td mat-cell *matCellDef="let p">{{ paymentMethodLabel(p.method) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef>Monto</th>
+              <td mat-cell *matCellDef="let p">{{ p.amount | bgCurrency }}</td>
+            </ng-container>
+            <ng-container matColumnDef="reference">
+              <th mat-header-cell *matHeaderCellDef>Referencia</th>
+              <td mat-cell *matCellDef="let p">{{ p.reference || '-' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef>Fecha</th>
+              <td mat-cell *matCellDef="let p">{{ p.paymentDate | date:'dd/MM/yyyy' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="paymentColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: paymentColumns"></tr>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (inv.status !== InvoiceStatus.Anulada) {
+      <div class="actions">
+        <button mat-raised-button color="warn" (click)="openCancelDialog()">
+          <mat-icon>cancel</mat-icon>
+          Anular factura
+        </button>
+      </div>
+    }
+  }
+}
