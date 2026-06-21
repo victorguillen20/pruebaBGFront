@@ -108,9 +108,10 @@ export class UserListComponent implements OnInit {
     });
   }
 
-  openChangePasswordDialog(): void {
+  openChangePasswordDialog(user: UserResponse): void {
     const ref = this.dialog.open(UserChangePasswordDialogComponent, {
       width: '450px',
+      data: { user },
     });
 
     ref.afterClosed().subscribe((result) => {
