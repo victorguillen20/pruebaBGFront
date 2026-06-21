@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { debounceTime, Subject, distinctUntilChanged } from 'rxjs';
 import { CustomersService, CustomerSearchParams } from '../../../../core/api/customers.service';
 import { CustomerResponse, PagedResult } from '../../../../core/api/api.types';
@@ -28,6 +29,7 @@ import { BgCurrencyPipe } from '../../../../shared/pipes/bg-currency.pipe';
     MatFormFieldModule,
     MatButtonModule,
     MatChipsModule,
+    MatSlideToggleModule,
     LoadingSpinnerComponent,
     ErrorBannerComponent,
     BgCurrencyPipe,
@@ -43,6 +45,7 @@ export class CustomerListComponent implements OnInit {
   readonly data = signal<PagedResult<CustomerResponse> | null>(null);
 
   readonly searchTerm = signal('');
+  readonly activeOnly = signal(true);
   private readonly searchSubject = new Subject<string>();
 
   readonly displayedColumns = ['identification', 'name', 'type', 'phone', 'email', 'creditLimit', 'isActive'];
@@ -64,11 +67,17 @@ export class CustomerListComponent implements OnInit {
     this.searchSubject.next(value);
   }
 
+  onActiveOnlyChange(value: boolean): void {
+    this.activeOnly.set(value);
+    this.page = 1;
+    this.load();
+  }
+
   load(): void {
     this.loading.set(true);
     this.error.set('');
 
-    const params: CustomerSearchParams = { page: this.page, pageSize: this.pageSize, activeOnly: false };
+    const params: CustomerSearchParams = { page: this.page, pageSize: this.pageSize, activeOnly: this.activeOnly() };
     if (this.searchTerm()) params.search = this.searchTerm();
 
     this.customersService.search(params)

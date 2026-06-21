@@ -7,6 +7,10 @@
     <mat-label>Buscar cliente</mat-label>
     <input matInput [ngModel]="searchTerm()" (ngModelChange)="onSearchInput($event)" placeholder="Nombre o identificaci&oacute;n" />
   </mat-form-field>
+
+  <mat-slide-toggle [checked]="activeOnly()" (change)="onActiveOnlyChange($event.checked)">
+    Solo activos
+  </mat-slide-toggle>
 </div>
 
 @if (loading()) {
