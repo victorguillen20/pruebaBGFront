@@ -1,0 +1,123 @@
+@if (loading()) {
+  <app-loading-spinner [loading]="true" />
+} @else if (error()) {
+  <app-error-banner [message]="error()" (retry)="load()" />
+} @else {
+  @if (data(); as d) {
+    <div class="dashboard-header">
+      <h1>Dashboard</h1>
+    </div>
+
+    <div class="kpi-grid">
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon" color="primary">receipt</mat-icon>
+          <div class="kpi-value">{{ d.totalInvoices }}</div>
+          <div class="kpi-label">Facturas</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon" color="accent">people</mat-icon>
+          <div class="kpi-value">{{ d.totalCustomers }}</div>
+          <div class="kpi-label">Clientes</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon" color="primary">inventory_2</mat-icon>
+          <div class="kpi-value">{{ d.totalActiveProducts }}</div>
+          <div class="kpi-label">Productos activos</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon" color="accent">attach_money</mat-icon>
+          <div class="kpi-value">{{ d.totalRevenue | bgCurrency }}</div>
+          <div class="kpi-label">Ingresos totales</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="sections-grid">
+      <mat-card class="section-card">
+        <mat-card-header>
+          <mat-card-title>&Uacute;ltimas facturas</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (d.recentInvoices.length === 0) {
+            <p class="empty-text">No hay facturas recientes</p>
+          } @else {
+            <table mat-table [dataSource]="d.recentInvoices" class="full-width">
+              <ng-container matColumnDef="number">
+                <th mat-header-cell *matHeaderCellDef>N&uacute;mero</th>
+                <td mat-cell *matCellDef="let inv">
+                  <a [routerLink]="['/invoices', inv.id]">#{{ inv.number }}</a>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                <td mat-cell *matCellDef="let inv">{{ inv.date | date:'dd/MM/yyyy' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="customer">
+                <th mat-header-cell *matHeaderCellDef>Cliente</th>
+                <td mat-cell *matCellDef="let inv">{{ inv.customerName }}</td>
+              </ng-container>
+              <ng-container matColumnDef="total">
+                <th mat-header-cell *matHeaderCellDef>Total</th>
+                <td mat-cell *matCellDef="let inv">{{ inv.total | bgCurrency }}</td>
+              </ng-container>
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Estado</th>
+                <td mat-cell *matCellDef="let inv">
+                  <mat-chip [color]="inv.status === 'Pagada' ? 'primary' : inv.status === 'Anulada' ? 'warn' : 'accent'" highlighted>
+                    {{ inv.status }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="recentColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: recentColumns"></tr>
+            </table>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="section-card">
+        <mat-card-header>
+          <mat-card-title>Productos m&aacute;s vendidos</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (d.topProducts.length === 0) {
+            <p class="empty-text">No hay datos de productos</p>
+          } @else {
+            <table mat-table [dataSource]="d.topProducts" class="full-width">
+              <ng-container matColumnDef="product">
+                <th mat-header-cell *matHeaderCellDef>Producto</th>
+                <td mat-cell *matCellDef="let p">{{ p.productName }}</td>
+              </ng-container>
+              <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef>C&oacute;digo</th>
+                <td mat-cell *matCellDef="let p">{{ p.productCode }}</td>
+              </ng-container>
+              <ng-container matColumnDef="quantity">
+                <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+                <td mat-cell *matCellDef="let p">{{ p.totalQuantitySold }}</td>
+              </ng-container>
+              <ng-container matColumnDef="revenue">
+                <th mat-header-cell *matHeaderCellDef>Ingresos</th>
+                <td mat-cell *matCellDef="let p">{{ p.totalRevenue | bgCurrency }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="topColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: topColumns"></tr>
+            </table>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+}
