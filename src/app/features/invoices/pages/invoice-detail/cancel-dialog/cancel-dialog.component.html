@@ -1,0 +1,11 @@
+<h2 mat-dialog-title>Anular factura</h2>
+
+<mat-dialog-content>
+  <p>&iquest;Est&aacute; seguro de que desea anular la factura <strong>#{{ data.invoiceNumber }}</strong>?</p>
+  <p>Esta acci&oacute;n no se puede deshacer.</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="warn" (click)="onConfirm()">Anular factura</button>
+</mat-dialog-actions>
