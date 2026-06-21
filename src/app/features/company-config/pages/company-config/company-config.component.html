@@ -1,0 +1,131 @@
+<div class="page-header">
+  <h1>Configuraci&oacute;n</h1>
+</div>
+
+@if (loading()) {
+  <app-loading-spinner [loading]="true" />
+} @else if (error()) {
+  <app-error-banner [message]="error()" (retry)="load()" />
+} @else {
+  <div class="config-layout">
+    <div class="logo-section">
+      <mat-card class="logo-card">
+        <mat-card-content class="logo-card-content">
+          <div class="logo-preview">
+            @if (previewUrl()) {
+              <img [src]="previewUrl()" alt="Logo" class="logo-image" />
+            } @else {
+              <div class="logo-placeholder">
+                <mat-icon>business</mat-icon>
+                <span>Sin logo</span>
+              </div>
+            }
+          </div>
+
+          <div class="logo-upload">
+            <span class="file-label">Seleccionar logo</span>
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+              hidden
+            />
+            <button mat-stroked-button (click)="fileInput.click()" [disabled]="uploading()">
+              Examinar...
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="form-section">
+      <mat-card>
+        <mat-card-content>
+          <form [formGroup]="form" class="config-form">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="label-field">
+                <mat-label>Nombre de la empresa</mat-label>
+                <input matInput formControlName="companyName" />
+                @if (form.get('companyName')?.hasError('required') && form.get('companyName')?.touched) {
+                  <mat-error>El nombre es obligatorio</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="label-field">
+                <mat-label>Tel&eacute;fono</mat-label>
+                <input matInput formControlName="phone" />
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="label-field">
+                <mat-label>Correo electr&oacute;nico</mat-label>
+                <input matInput formControlName="email" type="email" />
+                @if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+                  <mat-error>Ingrese un email v&aacute;lido</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="form-row two-columns">
+              <mat-form-field appearance="outline" class="label-field">
+                <mat-label>IVA (%)</mat-label>
+                <input matInput formControlName="taxPercent" type="number" step="0.01" />
+                @if (form.get('taxPercent')?.hasError('required') && form.get('taxPercent')?.touched) {
+                  <mat-error>El IVA es obligatorio</mat-error>
+                }
+                @if (form.get('taxPercent')?.hasError('min') || form.get('taxPercent')?.hasError('max')) {
+                  <mat-error>Valor entre 0 y 100</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="label-field">
+                <mat-label>S&iacute;mbolo de moneda</mat-label>
+                <input matInput formControlName="currencySymbol" maxlength="5" />
+                @if (form.get('currencySymbol')?.hasError('required') && form.get('currencySymbol')?.touched) {
+                  <mat-error>El s&iacute;mbolo es obligatorio</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="label-field">
+                <mat-label>Direcci&oacute;n</mat-label>
+                <input matInput formControlName="address" />
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="label-field">
+                <mat-label>Ciudad</mat-label>
+                <input matInput formControlName="city" />
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="label-field">
+                <mat-label>Regi&oacute;n/Provincia</mat-label>
+                <input matInput formControlName="region" />
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="label-field">
+                <mat-label>C&oacute;digo postal</mat-label>
+                <input matInput formControlName="postalCode" />
+              </mat-form-field>
+            </div>
+          </form>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || saving()">
+            {{ saving() ? 'Guardando...' : 'Actualizar datos' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+}
