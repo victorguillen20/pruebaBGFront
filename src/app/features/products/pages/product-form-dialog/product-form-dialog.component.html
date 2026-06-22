@@ -1,0 +1,84 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar producto' : 'Agregar nuevo producto' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <div class="code-field-row">
+      <mat-form-field appearance="outline" class="code-field">
+        <mat-label>C&oacute;digo</mat-label>
+        <input matInput formControlName="code" readonly />
+        @if (form.get('code')?.hasError('required') && form.get('code')?.touched) {
+          <mat-error>El c&oacute;digo es obligatorio</mat-error>
+        }
+      </mat-form-field>
+      @if (!isEdit) {
+        <button mat-stroked-button type="button" (click)="regenerateCode()">Regenerar</button>
+      }
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" />
+      @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+        <mat-error>El nombre es obligatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Descripci&oacute;n</mat-label>
+      <textarea matInput formControlName="description" rows="3"></textarea>
+    </mat-form-field>
+
+    <div class="row-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Precio</mat-label>
+        <input matInput formControlName="price" type="number" step="0.01" min="0" />
+        @if (form.get('price')?.hasError('required') && form.get('price')?.touched) {
+          <mat-error>El precio es obligatorio</mat-error>
+        }
+        @if (form.get('price')?.hasError('min') && form.get('price')?.touched) {
+          <mat-error>El precio no puede ser negativo</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Costo</mat-label>
+        <input matInput formControlName="cost" type="number" step="0.01" min="0" />
+        @if (form.get('cost')?.hasError('min') && form.get('cost')?.touched) {
+          <mat-error>El costo no puede ser negativo</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="row-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Stock</mat-label>
+        <input matInput formControlName="stock" type="number" min="0" />
+        @if (form.get('stock')?.hasError('required') && form.get('stock')?.touched) {
+          <mat-error>El stock es obligatorio</mat-error>
+        }
+        @if (form.get('stock')?.hasError('min') && form.get('stock')?.touched) {
+          <mat-error>El stock no puede ser negativo</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categor&iacute;a</mat-label>
+        <mat-select formControlName="categoryId" (selectionChange)="onCategoryChange()">
+          @for (cat of categories(); track cat.id) {
+            <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('categoryId')?.hasError('required') && form.get('categoryId')?.touched) {
+          <mat-error>La categor&iacute;a es obligatoria</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cerrar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || saving()">
+    {{ saving() ? 'Guardando...' : (isEdit ? 'Actualizar datos' : 'Guardar datos') }}
+  </button>
+</mat-dialog-actions>

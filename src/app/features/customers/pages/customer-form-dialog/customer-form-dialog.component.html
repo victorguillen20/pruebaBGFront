@@ -1,0 +1,71 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar cliente' : 'Agregar nuevo cliente' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Identificaci&oacute;n</mat-label>
+      <input matInput formControlName="identification" [readonly]="isEdit" (input)="onIdentificationInput($any($event).target.value)" maxlength="13" />
+      @if (form.get('identification')?.hasError('required') && form.get('identification')?.touched) {
+        <mat-error>La identificaci&oacute;n es obligatoria</mat-error>
+      }
+      @if (form.get('identification')?.hasError('invalidIdentification') && form.get('identification')?.touched) {
+        <mat-error>La identificaci&oacute;n debe tener entre 10 y 13 d&iacute;gitos, sin guiones</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" />
+      @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+        <mat-error>El nombre es obligatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo</mat-label>
+      <mat-select formControlName="type">
+        @for (opt of typeOptions; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+      @if (form.get('type')?.hasError('required') && form.get('type')?.touched) {
+        <mat-error>El tipo es obligatorio</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="row-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Tel&eacute;fono</mat-label>
+        <input matInput formControlName="phone" type="tel" maxlength="6" (input)="onPhoneInput($any($event).target.value)" />
+        @if (form.get('phone')?.hasError('invalidPhone') && form.get('phone')?.touched) {
+          <mat-error>El tel&eacute;fono debe tener m&aacute;ximo 6 d&iacute;gitos, sin guiones</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email" />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Direcci&oacute;n</mat-label>
+      <textarea matInput formControlName="address" rows="3"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>L&iacute;mite de cr&eacute;dito</mat-label>
+      <input matInput formControlName="creditLimit" type="number" step="0.01" min="0" />
+      @if (form.get('creditLimit')?.hasError('min') && form.get('creditLimit')?.touched) {
+        <mat-error>El l&iacute;mite de cr&eacute;dito no puede ser negativo</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cerrar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || saving()">
+    {{ saving() ? 'Guardando...' : (isEdit ? 'Actualizar datos' : 'Guardar datos') }}
+  </button>
+</mat-dialog-actions>

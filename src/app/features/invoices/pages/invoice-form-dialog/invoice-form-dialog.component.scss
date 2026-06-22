@@ -1,0 +1,72 @@
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.row-fields {
+  display: flex;
+  gap: 16px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.details-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fafafa;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.subtotal-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 100px;
+  padding: 16px 8px 0;
+
+  .subtotal-label {
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .subtotal-value {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.total-row {
+  text-align: right;
+  padding-top: 8px;
+  font-size: 16px;
+}

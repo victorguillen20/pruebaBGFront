@@ -10,6 +10,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { debounceTime, Subject, distinctUntilChanged } from 'rxjs';
 import { ProductsService, ProductSearchParams } from '../../../../core/api/products.service';
 import { CategoriesService } from '../../../../core/api/categories.service';
@@ -17,6 +21,8 @@ import { ProductResponse, CategoryResponse, PagedResult } from '../../../../core
 import { LoadingSpinnerComponent } from '../../../../shared/loading-spinner/loading-spinner.component';
 import { ErrorBannerComponent } from '../../../../shared/error-banner/error-banner.component';
 import { BgCurrencyPipe } from '../../../../shared/pipes/bg-currency.pipe';
+import { ProductFormDialogComponent } from '../product-form-dialog/product-form-dialog.component';
+import { ProductDeleteDialogComponent } from '../product-delete-dialog/product-delete-dialog.component';
 
 @Component({
   selector: 'app-product-list',
@@ -31,6 +37,8 @@ import { BgCurrencyPipe } from '../../../../shared/pipes/bg-currency.pipe';
     MatFormFieldModule,
     MatButtonModule,
     MatChipsModule,
+    MatIconModule,
+    MatTooltipModule,
     LoadingSpinnerComponent,
     ErrorBannerComponent,
     BgCurrencyPipe,
@@ -41,6 +49,8 @@ import { BgCurrencyPipe } from '../../../../shared/pipes/bg-currency.pipe';
 export class ProductListComponent implements OnInit {
   private readonly productsService = inject(ProductsService);
   private readonly categoriesService = inject(CategoriesService);
+  readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
 
   readonly loading = signal(false);
   readonly error = signal('');
@@ -51,7 +61,7 @@ export class ProductListComponent implements OnInit {
   readonly categoryFilter = signal<number | ''>('');
   private readonly searchSubject = new Subject<string>();
 
-  readonly displayedColumns = ['code', 'name', 'categoryName', 'price', 'cost', 'stock', 'isActive'];
+  readonly displayedColumns = ['code', 'name', 'categoryName', 'price', 'cost', 'stock', 'isActive', 'acciones'];
 
   page = 1;
   pageSize = 10;
@@ -99,5 +109,62 @@ export class ProductListComponent implements OnInit {
   applyFilters(): void {
     this.page = 1;
     this.load();
+  }
+
+  private getExistingCodes(): string[] {
+    return this.data()?.items.map(p => p.code) ?? [];
+  }
+
+  openCreateDialog(): void {
+    const ref = this.dialog.open(ProductFormDialogComponent, {
+      width: '550px',
+      data: {
+        mode: 'create',
+        existingCodes: this.getExistingCodes(),
+      },
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        this.snackBar.open('Producto creado exitosamente', 'Cerrar', { duration: 3000 });
+        this.load();
+      }
+    });
+  }
+
+  openEditDialog(product: ProductResponse): void {
+    const ref = this.dialog.open(ProductFormDialogComponent, {
+      width: '550px',
+      data: {
+        mode: 'edit',
+        product,
+        existingCodes: this.getExistingCodes(),
+      },
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        this.snackBar.open('Producto actualizado exitosamente', 'Cerrar', { duration: 3000 });
+        this.load();
+      }
+    });
+  }
+
+  openDeleteDialog(product: ProductResponse): void {
+    const ref = this.dialog.open(ProductDeleteDialogComponent, {
+      width: '400px',
+      data: product,
+    });
+
+    ref.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) return;
+      this.productsService.delete(product.id).subscribe({
+        next: () => {
+          this.snackBar.open('Producto desactivado exitosamente', 'Cerrar', { duration: 3000 });
+          this.load();
+        },
+        error: () => this.snackBar.open('Error al desactivar el producto', 'Cerrar', { duration: 3000 }),
+      });
+    });
   }
 }

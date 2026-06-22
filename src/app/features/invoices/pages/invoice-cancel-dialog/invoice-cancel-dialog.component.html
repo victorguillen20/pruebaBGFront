@@ -1,0 +1,14 @@
+<div class="dialog-icon">
+  <mat-icon class="warn-icon">warning</mat-icon>
+</div>
+
+<h2 mat-dialog-title class="dialog-title">&iquest;Anular factura?</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p>La factura #{{ invoice.number }} no se eliminar&aacute;, quedar&aacute; marcada como anulada.</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="center">
+  <button mat-raised-button color="primary" (click)="onConfirm()">S&iacute;, anular</button>
+  <button mat-raised-button color="warn" (click)="onCancel()">Cancelar</button>
+</mat-dialog-actions>

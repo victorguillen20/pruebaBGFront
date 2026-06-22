@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ProductResponse, PagedResult } from './api.types';
+import { ProductResponse, PagedResult, CreateProductRequest, UpdateProductRequest } from './api.types';
 
 export interface ProductSearchParams {
   search?: string;
@@ -29,5 +29,21 @@ export class ProductsService {
 
   getById(id: number): Observable<ProductResponse> {
     return this.http.get<ProductResponse>(`${this.baseUrl}/${id}`);
+  }
+
+  create(request: CreateProductRequest): Observable<ProductResponse> {
+    return this.http.post<ProductResponse>(this.baseUrl, request);
+  }
+
+  update(id: number, request: UpdateProductRequest): Observable<ProductResponse> {
+    return this.http.put<ProductResponse>(`${this.baseUrl}/${id}`, request);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  activate(id: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/activate`, {});
   }
 }

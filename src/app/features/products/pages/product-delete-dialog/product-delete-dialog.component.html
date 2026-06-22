@@ -1,0 +1,14 @@
+<div class="dialog-icon">
+  <mat-icon class="warn-icon">warning</mat-icon>
+</div>
+
+<h2 mat-dialog-title class="dialog-title">&iquest;Estas seguro?</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p>&iexcl;No podr&aacute;s revertir esto!</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="center">
+  <button mat-raised-button color="primary" (click)="onConfirm()">S&iacute;, eliminarlo!</button>
+  <button mat-raised-button color="warn" (click)="onCancel()">Cancelar</button>
+</mat-dialog-actions>

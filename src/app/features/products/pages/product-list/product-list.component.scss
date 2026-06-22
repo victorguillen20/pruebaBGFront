@@ -1,4 +1,7 @@
 .page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
 
   h1 {
@@ -30,4 +33,16 @@
 
 .inactive {
   opacity: 0.6;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 0;
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 16px;
 }

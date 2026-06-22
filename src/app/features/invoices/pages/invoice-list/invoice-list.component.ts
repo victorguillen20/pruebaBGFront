@@ -14,11 +14,17 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { InvoicesService, InvoiceSearchParams } from '../../../../core/api/invoices.service';
-import { InvoiceSummaryResponse, InvoiceStatus, PagedResult } from '../../../../core/api/api.types';
+import { InvoiceSummaryResponse, InvoiceStatus, InvoiceType, PagedResult } from '../../../../core/api/api.types';
 import { LoadingSpinnerComponent } from '../../../../shared/loading-spinner/loading-spinner.component';
 import { ErrorBannerComponent } from '../../../../shared/error-banner/error-banner.component';
 import { BgCurrencyPipe } from '../../../../shared/pipes/bg-currency.pipe';
+import { InvoiceFormDialogComponent } from '../invoice-form-dialog/invoice-form-dialog.component';
+import { InvoiceCancelDialogComponent } from '../invoice-cancel-dialog/invoice-cancel-dialog.component';
 
 @Component({
   selector: 'app-invoice-list',
@@ -36,6 +42,8 @@ import { BgCurrencyPipe } from '../../../../shared/pipes/bg-currency.pipe';
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
     LoadingSpinnerComponent,
     ErrorBannerComponent,
     BgCurrencyPipe,
@@ -45,6 +53,8 @@ import { BgCurrencyPipe } from '../../../../shared/pipes/bg-currency.pipe';
 })
 export class InvoiceListComponent implements OnInit {
   private readonly invoicesService = inject(InvoicesService);
+  readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
 
   readonly loading = signal(false);
   readonly error = signal('');
@@ -69,7 +79,7 @@ export class InvoiceListComponent implements OnInit {
     });
   });
 
-  readonly displayedColumns = ['number', 'date', 'customerName', 'sellerName', 'type', 'status', 'total'];
+  readonly displayedColumns = ['number', 'date', 'customerName', 'sellerName', 'type', 'status', 'total', 'acciones'];
 
   readonly InvoiceStatus = InvoiceStatus;
   readonly statusOptions = [
@@ -134,12 +144,47 @@ export class InvoiceListComponent implements OnInit {
     this.load();
   }
 
-  statusLabel(status: InvoiceStatus): string {
-    const opt = this.statusOptions.find((s) => s.value === status);
-    return opt?.label ?? '';
+  typeLabel(type: InvoiceType | string | number): string {
+    if (type === InvoiceType.Contado || type === 'Contado' || type === 1) return 'Contado';
+    if (type === InvoiceType.Credito || type === 'Credito' || type === 2) return 'Cr\u00e9dito';
+    return '';
   }
 
-  typeLabel(type: number): string {
-    return type === 1 ? 'Contado' : type === 2 ? 'Cr\u00e9dito' : '';
+  statusLabel(status: InvoiceStatus | string | number): string {
+    if (status === InvoiceStatus.Pendiente || status === 'Pendiente' || status === 1) return 'Pendiente';
+    if (status === InvoiceStatus.Pagada || status === 'Pagada' || status === 2) return 'Pagada';
+    if (status === InvoiceStatus.Anulada || status === 'Anulada' || status === 3) return 'Anulada';
+    return '';
+  }
+
+  openCreateDialog(): void {
+    const ref = this.dialog.open(InvoiceFormDialogComponent, {
+      width: '750px',
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (result) {
+        this.snackBar.open('Factura creada exitosamente', 'Cerrar', { duration: 3000 });
+        this.load();
+      }
+    });
+  }
+
+  openCancelDialog(invoice: InvoiceSummaryResponse): void {
+    const ref = this.dialog.open(InvoiceCancelDialogComponent, {
+      width: '400px',
+      data: invoice,
+    });
+
+    ref.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) return;
+      this.invoicesService.cancel(invoice.id).subscribe({
+        next: () => {
+          this.snackBar.open('Factura anulada exitosamente', 'Cerrar', { duration: 3000 });
+          this.load();
+        },
+        error: () => this.snackBar.open('Error al anular la factura', 'Cerrar', { duration: 3000 }),
+      });
+    });
   }
 }

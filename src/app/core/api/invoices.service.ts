@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { InvoiceResponse, InvoiceSummaryResponse, PagedResult, InvoiceStatus } from './api.types';
+import { InvoiceResponse, InvoiceSummaryResponse, PagedResult, InvoiceStatus, CreateInvoiceRequest } from './api.types';
 
 export interface InvoiceSearchParams {
   search?: string;
@@ -34,6 +34,10 @@ export class InvoicesService {
 
   getById(id: number): Observable<InvoiceResponse> {
     return this.http.get<InvoiceResponse>(`${this.baseUrl}/${id}`);
+  }
+
+  create(request: CreateInvoiceRequest): Observable<InvoiceResponse> {
+    return this.http.post<InvoiceResponse>(this.baseUrl, request);
   }
 
   cancel(id: number): Observable<void> {

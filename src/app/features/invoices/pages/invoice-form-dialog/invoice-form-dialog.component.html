@@ -1,0 +1,113 @@
+<h2 mat-dialog-title>Nueva factura</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <div class="row-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Cliente</mat-label>
+        <mat-select formControlName="customerId">
+          @for (c of customers(); track c.id) {
+            <mat-option [value]="c.id">{{ c.name }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('customerId')?.hasError('required') && form.get('customerId')?.touched) {
+          <mat-error>El cliente es obligatorio</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="type" (selectionChange)="onTypeChange()">
+          <mat-option [value]="InvoiceType.Contado">Contado</mat-option>
+          <mat-option [value]="InvoiceType.Credito">Cr&eacute;dito</mat-option>
+        </mat-select>
+        @if (form.get('type')?.hasError('required') && form.get('type')?.touched) {
+          <mat-error>El tipo es obligatorio</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha vencimiento</mat-label>
+        <input matInput [matDatepicker]="duePicker" formControlName="dueDate" />
+        <mat-datepicker-toggle matSuffix [for]="duePicker" />
+        <mat-datepicker #duePicker />
+        @if (form.get('dueDate')?.hasError('required') && form.get('dueDate')?.touched) {
+          <mat-error>La fecha de vencimiento es obligatoria para cr&eacute;dito</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Notas</mat-label>
+      <textarea matInput formControlName="notes" rows="2"></textarea>
+    </mat-form-field>
+
+    <div class="section-header">
+      <h3>Detalle de factura</h3>
+      <button mat-stroked-button type="button" (click)="addDetailLine()">
+        <mat-icon>add</mat-icon>
+        Agregar l&iacute;nea
+      </button>
+    </div>
+
+    <div formArrayName="details" class="details-table">
+      @for (detail of detailsFormArray.controls; track $index) {
+        <div [formGroupName]="$index" class="detail-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Producto</mat-label>
+            <mat-select formControlName="productId" (selectionChange)="onProductSelect($index)">
+              @for (p of products(); track p.id) {
+                <mat-option [value]="p.id">{{ p.code }} - {{ p.name }}</mat-option>
+              }
+            </mat-select>
+            @if (detail.get('productId')?.hasError('required') && detail.get('productId')?.touched) {
+              <mat-error>Obligatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Cantidad</mat-label>
+            <input matInput formControlName="quantity" type="number" min="1" />
+            @if (detail.get('quantity')?.hasError('required') && detail.get('quantity')?.touched) {
+              <mat-error>Obligatorio</mat-error>
+            }
+            @if (detail.get('quantity')?.hasError('min') && detail.get('quantity')?.touched) {
+              <mat-error>M&iacute;nimo 1</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Precio unitario</mat-label>
+            <input matInput formControlName="unitPrice" type="number" step="0.01" min="0" />
+            @if (detail.get('unitPrice')?.hasError('required') && detail.get('unitPrice')?.touched) {
+              <mat-error>Obligatorio</mat-error>
+            }
+            @if (detail.get('unitPrice')?.hasError('min') && detail.get('unitPrice')?.touched) {
+              <mat-error>No puede ser negativo</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="subtotal-cell">
+            <span class="subtotal-label">Subtotal</span>
+            <span class="subtotal-value">{{ lineSubtotal($index) | currency:'':'':'1.2-2' }}</span>
+          </div>
+
+          <button mat-icon-button color="warn" type="button" (click)="removeDetailLine($index)" [disabled]="detailsFormArray.length <= 1">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="total-row">
+      <strong>Total factura: {{ invoiceTotal() | currency:'':'':'1.2-2' }}</strong>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cerrar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || saving()">
+    {{ saving() ? 'Guardando...' : 'Guardar factura' }}
+  </button>
+</mat-dialog-actions>

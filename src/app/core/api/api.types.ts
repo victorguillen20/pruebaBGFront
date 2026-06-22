@@ -117,9 +117,33 @@ export interface InvoiceSummaryResponse {
   number: number;
   date: string;
   customerName: string;
+  type: InvoiceType;
   status: InvoiceStatus;
   total: number;
   sellerName: string | null;
+}
+
+export interface CreateInvoiceRequest {
+  customerId: number;
+  type: InvoiceType;
+  dueDate: string | null;
+  notes: string | null;
+  details: CreateInvoiceDetailRequest[];
+}
+
+export interface CreateInvoiceDetailRequest {
+  productId: number;
+  quantity: number;
+  unitPrice: number;
+  productName: string;
+  productCode: string;
+}
+
+export interface AddPaymentRequest {
+  method: PaymentMethod;
+  amount: number;
+  reference: string | null;
+  paymentDate: string | null;
 }
 
 export interface InvoiceDetailResponse {
@@ -205,6 +229,43 @@ export interface DashboardTopProduct {
   productCode: string;
   totalQuantitySold: number;
   totalRevenue: number;
+}
+
+export interface CreateCustomerRequest {
+  identification: string;
+  name: string;
+  type: CustomerType;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  creditLimit: number | null;
+}
+
+export interface UpdateCustomerRequest {
+  name: string;
+  type: CustomerType;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  creditLimit: number | null;
+}
+
+export interface CreateProductRequest {
+  code: string;
+  name: string;
+  description: string | null;
+  price: number;
+  cost: number | null;
+  stock: number;
+  categoryId: number;
+}
+
+export interface UpdateProductRequest {
+  name: string;
+  description: string | null;
+  price: number;
+  cost: number | null;
+  categoryId: number;
 }
 
 export interface PagedResult<T> {
