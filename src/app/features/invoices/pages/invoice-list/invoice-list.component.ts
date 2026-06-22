@@ -170,6 +170,16 @@ export class InvoiceListComponent implements OnInit {
     });
   }
 
+  downloadInvoice(row: InvoiceSummaryResponse): void {
+    this.invoicesService.downloadPdf(row.id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      },
+      error: () => this.snackBar.open('Error al generar el PDF', 'Cerrar', { duration: 3000 }),
+    });
+  }
+
   openCancelDialog(invoice: InvoiceSummaryResponse): void {
     const ref = this.dialog.open(InvoiceCancelDialogComponent, {
       width: '400px',

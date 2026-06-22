@@ -43,4 +43,8 @@ export class InvoicesService {
   cancel(id: number): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/${id}/cancel`, {});
   }
+
+  downloadPdf(id: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${id}/pdf`, { responseType: 'blob' });
+  }
 }

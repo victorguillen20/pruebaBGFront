@@ -12,7 +12,7 @@ describe('InvoiceListComponent', () => {
   let invoicesServiceSpy: jasmine.SpyObj<InvoicesService>;
 
   beforeEach(async () => {
-    invoicesServiceSpy = jasmine.createSpyObj('InvoicesService', ['search', 'cancel']);
+    invoicesServiceSpy = jasmine.createSpyObj('InvoicesService', ['search', 'cancel', 'downloadPdf']);
     invoicesServiceSpy.search.and.returnValue(of({
       items: [],
       total: 0,
@@ -123,5 +123,24 @@ describe('InvoiceListComponent', () => {
       total: 100,
     });
     expect(dialogSpy).toHaveBeenCalled();
+  });
+
+  it('downloadInvoice llama al servicio downloadPdf', () => {
+    const blob = new Blob(['%PDF-'], { type: 'application/pdf' });
+    invoicesServiceSpy.downloadPdf.and.returnValue(of(blob));
+
+    spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+    const openSpy = spyOn(window, 'open');
+
+    component.downloadInvoice({
+      id: 1, number: 1001, date: '2026-01-15T00:00:00',
+      customerName: 'Test', sellerName: 'Seller',
+      type: InvoiceType.Contado, status: InvoiceStatus.Pendiente,
+      total: 100,
+    });
+
+    expect(invoicesServiceSpy.downloadPdf).toHaveBeenCalledWith(1);
+    expect(window.URL.createObjectURL).toHaveBeenCalledWith(blob);
+    expect(openSpy).toHaveBeenCalledWith('blob:test', '_blank');
   });
 });
